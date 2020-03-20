@@ -8,19 +8,21 @@ import gzip
 
 class filer:
 
-    def __init__(self, dataDir, N=500):
+    def __init__(self, dataDir, N=10000):
         if not os.path.exists(dataDir):
             raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), dataDir)
         self.dataDir = dataDir
         self.counter = 0    #number of tweets in a file
         self.N = N          #max number of tweets in a file
         self.flushEvery = 100
+        self.file = None
         self.newFile()
 
 
     def emit(self, dictEntry):
         textToWtite = json.dumps(dictEntry)+ "\n"
         self.file.write(textToWtite)
+        self.counter += 1
         if self.counter > self.flushEvery:
             self.file.flush()
         if self.counter >= self.N:   # add condition  "if new day"
@@ -52,7 +54,7 @@ class filer:
 
 
 if __name__ == '__main__':
-    f = filer("./data", N=4)
+    f = filer("./data", N=2)
     f.emit({"First" : 1} )
     time.sleep(1)
     f.emit({"Second": 2,  "this": "tralalal"
